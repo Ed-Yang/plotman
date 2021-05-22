@@ -67,6 +67,7 @@ class Directories:
     tmp: List[str]
     dst: List[str]
     tmp2: Optional[str] = None
+    tmp2eqdst: Optional[bool] = False
     tmp_overrides: Optional[Dict[str, TmpOverrides]] = None
     archive: Optional[Archive] = None
 

@@ -111,6 +111,7 @@ def maybe_start_new_plot(dir_cfg, sched_cfg, plotting_cfg):
             )
 
             plot_args = ['chia', 'plots', 'create',
+                    '--override-k',
                     '-k', str(plotting_cfg.k),
                     '-r', str(plotting_cfg.n_threads),
                     '-u', str(plotting_cfg.n_buckets),
@@ -128,6 +129,10 @@ def maybe_start_new_plot(dir_cfg, sched_cfg, plotting_cfg):
             if dir_cfg.tmp2 is not None:
                 plot_args.append('-2')
                 plot_args.append(dir_cfg.tmp2)
+            else:
+                if dir_cfg.tmp2eqdst:
+                    plot_args.append('-2')
+                    plot_args.append(dstdir)
 
             logmsg = ('Starting plot job: %s ; logging to %s' % (' '.join(plot_args), logfile))
 
@@ -165,8 +170,13 @@ def maybe_start_new_plot(dir_cfg, sched_cfg, plotting_cfg):
                     stderr=subprocess.STDOUT,
                     start_new_session=True)
 
-            psutil.Process(p.pid).nice(15)
-            return (True, logmsg)
+            try:
+                # process might dead soon
+                time.sleep(2)
+                psutil.Process(p.pid).nice(15)
+                return (True, logmsg)
+            except:
+                wait_reason = 'plot create command failed'
 
     return (False, wait_reason)
 
